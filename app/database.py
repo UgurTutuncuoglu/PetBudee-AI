@@ -1,12 +1,23 @@
 
 import sqlite3
-from flask import g
+from flask import g, current_app
 
 
 def get_db():
     """Veritabanı bağlantısını oluşturur veya mevcut bağlantıyı döndürür."""
     if "db" not in g:
-        g.db = sqlite3.connect("petbudee.db")
+        database_url = current_app.config.get(
+            "DATABASE_URL", "sqlite:///petbudee.db"
+        )
+
+        # sqlite:///petbudee.db -> petbudee.db
+        prefix = "sqlite:///"
+        if not database_url.startswith(prefix):
+            raise ValueError("Desteklenmeyen DATABASE_URL biçimi")
+
+        db_path = database_url[len(prefix):]
+
+        g.db = sqlite3.connect(db_path)
         g.db.row_factory = sqlite3.Row
 
     return g.db
