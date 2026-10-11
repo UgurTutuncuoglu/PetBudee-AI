@@ -104,10 +104,6 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:5000
 python run.py
 ```
 
-Uygulama varsayılan olarak aşağıdaki adreste çalışır:
-
-http://127.0.0.1:5000
-
 ## API Endpointleri
 
 API rotaları `/api` ön ekiyle sunulur.
