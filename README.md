@@ -1,6 +1,6 @@
-# SmartLead AI
+# PetBudee AI
 
-SmartLead AI, Flask tabanlı bir web uygulamasıdır. Yapay zekâ destekli sohbet hizmeti sunar ve kullanıcı bilgilerini SQLite veritabanında saklar. Groq API, yapay zekâ yanıtlarının oluşturulması için kullanılır.
+PetBudee AI, Flask tabanlı bir web uygulamasıdır. Yapay zekâ destekli sohbet hizmeti sunar ve kullanıcı bilgilerini SQLite veritabanında saklar. Groq API, yapay zekâ yanıtlarının oluşturulması için kullanılır.
 
 ## Özellikler
 
@@ -55,8 +55,8 @@ smartlead_ai/
 ### 1. Projeyi klonlama
 
 ```bash
-git clone https://github.com/KULLANICI_ADI/smartlead-ai.git
-cd smartlead-ai
+git clone https://github.com/KULLANICI_ADI/PetBudee-AI.git
+cd smartlead_ai
 ```
 
 GitHub depo adresini kendi depo adresinizle değiştirin.
@@ -89,7 +89,6 @@ Projenin ana dizininde `.env` dosyası oluşturun:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
-SECRET_KEY=your_secret_key
 AI_PROVIDER=groq
 DATABASE_URL=sqlite:///petbudee.db
 BUSINESS_CONTEXT="Sen yardımcı ve nazik bir yapay zekâ asistanısın."
@@ -144,7 +143,7 @@ Content-Type: application/json
 
 ```json
 {
-  "mesaj": "SmartLead AI ne işe yarar?",
+  "mesaj": "PetBudee AI ne işe yarar?",
   "gecmis": []
 }
 ```
