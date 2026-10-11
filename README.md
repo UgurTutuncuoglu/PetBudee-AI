@@ -288,3 +288,18 @@ Canlı ortamda Wix entegrasyonu yapılacaksa API adresi, yerel adres yerine Rend
 ## Lisans
 
 Bu proje eğitim ve geliştirme amacıyla hazırlanmıştır.
+
+# Sonuçlar
+<img width="483" height="152" alt="Ekran görüntüsü 2026-10-11 194709" src="https://github.com/user-attachments/assets/71330753-d050-44e8-9f6c-628fe08ef4e5" />
+<img width="402" height="197" alt="Ekran görüntüsü 2026-10-11 194728" src="https://github.com/user-attachments/assets/b81d6ffb-84f2-4e0a-bd54-65b4b8d04509" />
+<img width="500" height="195" alt="Ekran görüntüsü 2026-10-11 194749" src="https://github.com/user-attachments/assets/44bb3454-e5d7-47d6-8cf4-ce643ff6d80b" />
+<img width="545" height="551" alt="Ekran görüntüsü 2026-10-11 194844" src="https://github.com/user-attachments/assets/d410f916-2d7e-49d7-bb48-dea305ead900" />
+<img width="1598" height="500" alt="Ekran görüntüsü 2026-10-11 195208" src="https://github.com/user-attachments/assets/63e2fbaf-a29f-491c-8c28-58a6477fc125" />
+<img width="1617" height="532" alt="Ekran görüntüsü 2026-10-11 195234" src="https://github.com/user-attachments/assets/fb75269e-a348-4c8c-8e60-d521daae9a54" />
+
+
+
+
+
+
+
