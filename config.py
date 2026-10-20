@@ -37,6 +37,8 @@ class Config:
         "CORS_ORIGINS", "http://localhost:3000, http://127.0.0.1:5000 "
     )
 
+    ADMIN_MAIL = os.getenv("ADMIN_MAIL", "")
+
     DEBUG = False
 
     """Yerel geliştirme ortamının ayarlarını tanımlar."""
