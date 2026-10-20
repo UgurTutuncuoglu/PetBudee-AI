@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, jsonify
 from app.database import petbudee_ekle, tum_petbudeeler
 from app.services.ai_service import ai_service, AIServiceError
 
-
+from config import ADMIN_MAIL
 
 pages_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__)
@@ -135,9 +135,43 @@ def petbudeeleri_getir():
         }), 500
 
 
-# 6. Admin Login api/admin-login
-@app.route("/api/admin-login", methods=["POST"])
+# 6. POST /api/admin-login
+@api_bp.route("/admin-login", methods=["POST"])
 def admin_login():
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "basari": False,
+            "mesaj": "Gecerli bir JSON gondermelisiniz."
+        }), 400
+
+    email = data.get("email")
+
+    if not isinstance(email, str) or not email.strip():
+        return jsonify({
+            "basari": False,
+            "mesaj": "E-posta adresi zorunludur."
+        }), 400
+
+    admin_mail = ADMIN_MAIL.strip().casefold()
+
+    if not admin_mail:
+        return jsonify({
+            "basari": False,
+            "mesaj": "Yönetici e-posta ayarı yapılandırılmamış."
+        }), 500
+
+    if email.strip().casefold() == admin_mail:
+        return jsonify({
+            "basari": True,
+            "mesaj": "E-posta eşleşti."
+        }), 200
+
+    return jsonify({
+        "basari": False,
+        "mesaj": "Bu e-posta adresi yetkili değil."
+    }), 401
     data = request.get_json(silent=True) or {}
     email = data.get("email", "").strip().casefold()
 
