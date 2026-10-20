@@ -133,3 +133,29 @@ def petbudeeleri_getir():
             "basari": False,
             "mesaj": "Kayitlar getirilirken bir hata olustu."
         }), 500
+
+
+# 6. Admin Login api/admin-login
+@app.route("/api/admin-login", methods=["POST"])
+def admin_login():
+    data = request.get_json(silent=True) or {}
+    email = data.get("email", "").strip().casefold()
+
+    admin_mail = os.getenv("ADMIN_MAIL", "").strip().casefold()
+
+    if not admin_mail:
+        return jsonify({
+            "basari": False,
+            "mesaj": "Yönetici e-posta ayarı yapılandırılmamış."
+        }), 500
+
+    if email == admin_mail:
+        return jsonify({
+            "basari": True,
+            "mesaj": "E-posta eşleşti."
+        }), 200
+
+    return jsonify({
+        "basari": False,
+        "mesaj": "Bu e-posta adresi yetkili değil."
+    }), 401
