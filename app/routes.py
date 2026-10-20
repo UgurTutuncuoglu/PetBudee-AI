@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, jsonify
 from app.database import petbudee_ekle, tum_petbudeeler
 from app.services.ai_service import ai_service, AIServiceError
 
-from config import ADMIN_MAIL
+from config import Config
 
 pages_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__)
@@ -154,8 +154,8 @@ def admin_login():
             "mesaj": "E-posta adresi zorunludur."
         }), 400
 
-    admin_mail = ADMIN_MAIL.strip().casefold()
-
+    admin_mail = Config.ADMIN_MAIL.strip().casefold()
+    
     if not admin_mail:
         return jsonify({
             "basari": False,
@@ -163,27 +163,6 @@ def admin_login():
         }), 500
 
     if email.strip().casefold() == admin_mail:
-        return jsonify({
-            "basari": True,
-            "mesaj": "E-posta eşleşti."
-        }), 200
-
-    return jsonify({
-        "basari": False,
-        "mesaj": "Bu e-posta adresi yetkili değil."
-    }), 401
-    data = request.get_json(silent=True) or {}
-    email = data.get("email", "").strip().casefold()
-
-    admin_mail = os.getenv("ADMIN_MAIL", "").strip().casefold()
-
-    if not admin_mail:
-        return jsonify({
-            "basari": False,
-            "mesaj": "Yönetici e-posta ayarı yapılandırılmamış."
-        }), 500
-
-    if email == admin_mail:
         return jsonify({
             "basari": True,
             "mesaj": "E-posta eşleşti."
