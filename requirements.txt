@@ -4,3 +4,4 @@ groq
 requests
 Flask-CORS
 gunicorn
+PyJWT

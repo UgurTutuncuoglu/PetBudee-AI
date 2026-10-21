@@ -7,6 +7,7 @@ load_dotenv()
 
 
 class Config:
+    
     SECRET_KEY = os.environ.get(
         "SECRET_KEY", "insecure-development-key"
     )
@@ -38,6 +39,7 @@ class Config:
     )
 
     ADMIN_MAIL = os.getenv("ADMIN_MAIL", "")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
     DEBUG = False
 

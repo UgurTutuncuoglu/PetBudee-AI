@@ -1,3 +1,8 @@
+import hmac
+import jwt
+
+from datetime import datetime, timedelta, timezone
+from functools import wraps
 
 from flask import Blueprint, render_template, request, jsonify
 
@@ -8,6 +13,53 @@ from config import Config
 
 pages_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__)
+
+def admin_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        # Sunucu ayarları eksikse güvenli şekilde reddet.
+        if not Config.SECRET_KEY or not Config.ADMIN_MAIL:
+            return jsonify({
+                "basari": False,
+                "mesaj": "Yönetici ayarları yapılandırılmamış."
+            }), 500
+
+        auth_header = request.headers.get("Authorization", "")
+        parts = auth_header.split()
+
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return jsonify({
+                "basari": False,
+                "mesaj": "Yönetici girişi gerekli."
+            }), 401
+
+        try:
+            payload = jwt.decode(
+                parts[1],
+                Config.SECRET_KEY,
+                algorithms=["HS256"]
+            )
+
+            admin_mail = Config.ADMIN_MAIL.strip().casefold()
+
+            if payload.get("sub") != admin_mail:
+                raise jwt.InvalidTokenError("Yetkisiz kullanıcı")
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({
+                "basari": False,
+                "mesaj": "Oturum süresi doldu. Yeniden giriş yapın."
+            }), 401
+
+        except jwt.InvalidTokenError:
+            return jsonify({
+                "basari": False,
+                "mesaj": "Geçersiz token."
+            }), 401
+
+        return view(*args, **kwargs)
+
+    return wrapped
 
 # 1. GET /
 @pages_bp.route("/", methods=["GET"])
@@ -119,6 +171,7 @@ def yeni_petbudee():
 
 # 5. GET /api/petbudees
 @api_bp.route("/petbudees", methods=["GET"])
+@admin_required
 def petbudeeleri_getir():
     try:
         records = tum_petbudeeler()
@@ -137,7 +190,76 @@ def petbudeeleri_getir():
 
 # 6. POST /api/admin-login
 @api_bp.route("/admin-login", methods=["POST"])
+# POST /api/admin-login
+@api_bp.route("/admin-login", methods=["POST"])
 def admin_login():
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "basari": False,
+            "mesaj": "Geçerli bir JSON göndermelisiniz."
+        }), 400
+
+    email = data.get("email")
+    password = data.get("password")
+
+    if not isinstance(email, str) or not isinstance(password, str):
+        return jsonify({
+            "basari": False,
+            "mesaj": "E-posta ve şifre zorunludur."
+        }), 400
+
+    if not email.strip() or not password:
+        return jsonify({
+            "basari": False,
+            "mesaj": "E-posta ve şifre zorunludur."
+        }), 400
+
+    admin_mail = Config.ADMIN_MAIL.strip().casefold()
+    admin_password = Config.ADMIN_PASSWORD
+
+    if not admin_mail or not admin_password or not Config.SECRET_KEY:
+        return jsonify({
+            "basari": False,
+            "mesaj": "Yönetici ayarları yapılandırılmamış."
+        }), 500
+
+    email_match = hmac.compare_digest(
+        email.strip().casefold(),
+        admin_mail
+    )
+
+    password_match = hmac.compare_digest(
+        password,
+        admin_password
+    )
+
+    if not (email_match and password_match):
+        return jsonify({
+            "basari": False,
+            "mesaj": "E-posta veya şifre hatalı."
+        }), 401
+
+    now = datetime.now(timezone.utc)
+
+    token = jwt.encode(
+        {
+            "sub": admin_mail,
+            "iat": now,
+            "exp": now + timedelta(minutes=15)
+        },
+        Config.SECRET_KEY,
+        algorithm="HS256"
+    )
+
+    return jsonify({
+        "basari": True,
+        "mesaj": "Giriş başarılı.",
+        "token": token,
+        "token_type": "Bearer",
+        "expires_in": 900
+    }), 200
     data = request.get_json(silent=True)
 
     if not isinstance(data, dict):
