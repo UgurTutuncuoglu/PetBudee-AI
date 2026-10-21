@@ -77,3 +77,14 @@ def tum_petbudeeler():
     ).fetchall()
 
     return records
+
+
+def petbudee_sayisi():
+    """Veritabanındaki toplam müşteri adayı sayısını döndürür."""
+    db = get_db()
+
+    result = db.execute(
+        "SELECT COUNT(*) AS toplam FROM petbudee"
+    ).fetchone()
+
+    return result["toplam"]

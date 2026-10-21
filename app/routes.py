@@ -6,7 +6,7 @@ from functools import wraps
 
 from flask import Blueprint, render_template, request, jsonify
 
-from app.database import petbudee_ekle, tum_petbudeeler
+from app.database import petbudee_ekle, tum_petbudeeler, petbudee_sayisi
 from app.services.ai_service import ai_service, AIServiceError
 
 from config import Config
@@ -260,37 +260,23 @@ def admin_login():
         "token_type": "Bearer",
         "expires_in": 900
     }), 200
-    data = request.get_json(silent=True)
 
-    if not isinstance(data, dict):
-        return jsonify({
-            "basari": False,
-            "mesaj": "Gecerli bir JSON gondermelisiniz."
-        }), 400
 
-    email = data.get("email")
 
-    if not isinstance(email, str) or not email.strip():
-        return jsonify({
-            "basari": False,
-            "mesaj": "E-posta adresi zorunludur."
-        }), 400
+# GET /api/petbudee-sayisi
+@api_bp.route("/petbudee-sayisi", methods=["GET"])
+@admin_required
+def petbudee_sayisini_getir():
+    try:
+        toplam = petbudee_sayisi()
 
-    admin_mail = Config.ADMIN_MAIL.strip().casefold()
-    
-    if not admin_mail:
-        return jsonify({
-            "basari": False,
-            "mesaj": "Yönetici e-posta ayarı yapılandırılmamış."
-        }), 500
-
-    if email.strip().casefold() == admin_mail:
         return jsonify({
             "basari": True,
-            "mesaj": "E-posta eşleşti."
+            "toplam": toplam
         }), 200
 
-    return jsonify({
-        "basari": False,
-        "mesaj": "Bu e-posta adresi yetkili değil."
-    }), 401
+    except Exception:
+        return jsonify({
+            "basari": False,
+            "mesaj": "Kayıt sayısı alınırken bir hata oluştu."
+        }), 500
