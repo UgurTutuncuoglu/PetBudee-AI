@@ -6,7 +6,7 @@ from functools import wraps
 
 from flask import Blueprint, render_template, request, jsonify
 
-from app.database import petbudee_ekle, tum_petbudeeler, petbudee_sayisi
+from app.database import petbudee_ekle, tum_petbudeeler, petbudee_sayisi, petbudee_gunluk_sayisi
 from app.services.ai_service import ai_service, AIServiceError
 
 from config import Config
@@ -279,4 +279,23 @@ def petbudee_sayisini_getir():
         return jsonify({
             "basari": False,
             "mesaj": "Kayıt sayısı alınırken bir hata oluştu."
+        }), 500
+
+
+# GET /api/petbudee-gunluk-sayisi
+@api_bp.route("/petbudee-gunluk-sayisi", methods=["GET"])
+@admin_required
+def petbudee_gunluk_sayisini_getir():
+    try:
+        toplam = petbudee_gunluk_sayisi()
+
+        return jsonify({
+            "basari": True,
+            "bugunku_toplam": toplam
+        }), 200
+
+    except Exception:
+        return jsonify({
+            "basari": False,
+            "mesaj": "Günlük kayıt sayısı alınırken bir hata oluştu."
         }), 500

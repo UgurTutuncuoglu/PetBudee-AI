@@ -88,3 +88,16 @@ def petbudee_sayisi():
     ).fetchone()
 
     return result["toplam"]
+
+
+def petbudee_gunluk_sayisi():
+    """Türkiye tarihine göre bugün eklenen kayıtların sayısını döndürür."""
+    db = get_db()
+
+    result = db.execute("""
+        SELECT COUNT(*) AS toplam
+        FROM petbudee
+        WHERE date(tarih, '+3 hours') = date('now', '+3 hours')
+    """).fetchone()
+
+    return result["toplam"]
