@@ -3,7 +3,6 @@ import jwt
 
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from werkzeug.security import check_password_hash
 from flask import Blueprint, render_template, request, jsonify
 
 from app.database import petbudee_ekle, tum_petbudeeler, petbudee_sayisi, petbudee_gunluk_sayisi
@@ -202,22 +201,22 @@ def admin_login():
     email = data.get("email")
     password = data.get("password")
 
-    if (
-        not isinstance(email, str)
-        or not isinstance(password, str)
-        or not email.strip()
-        or not password
-    ):
+    if not isinstance(email, str) or not isinstance(password, str):
         return jsonify({
             "basari": False,
             "mesaj": "E-posta ve şifre zorunludur."
         }), 400
 
-    admin_mail = (Config.ADMIN_MAIL or "").strip().casefold()
-    password_hash = Config.ADMIN_PASSWORD_HASH
-    secret_key = Config.SECRET_KEY
+    if not email.strip() or not password:
+        return jsonify({
+            "basari": False,
+            "mesaj": "E-posta ve şifre zorunludur."
+        }), 400
 
-    if not admin_mail or not password_hash or not secret_key:
+    admin_mail = Config.ADMIN_MAIL.strip().casefold()
+    admin_password = Config.ADMIN_PASSWORD
+
+    if not admin_mail or not admin_password or not Config.SECRET_KEY:
         return jsonify({
             "basari": False,
             "mesaj": "Yönetici ayarları yapılandırılmamış."
@@ -228,13 +227,10 @@ def admin_login():
         admin_mail
     )
 
-    try:
-        password_match = check_password_hash(
-            password_hash,
-            password
-        )
-    except (ValueError, TypeError):
-        password_match = False
+    password_match = hmac.compare_digest(
+        password,
+        admin_password
+    )
 
     if not (email_match and password_match):
         return jsonify({
@@ -250,7 +246,7 @@ def admin_login():
             "iat": now,
             "exp": now + timedelta(minutes=15)
         },
-        secret_key,
+        Config.SECRET_KEY,
         algorithm="HS256"
     )
 
