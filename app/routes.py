@@ -3,7 +3,7 @@ import jwt
 
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-
+from werkzeug.security import check_password_hash
 from flask import Blueprint, render_template, request, jsonify
 
 from app.database import petbudee_ekle, tum_petbudeeler, petbudee_sayisi, petbudee_gunluk_sayisi
@@ -190,8 +190,6 @@ def petbudeeleri_getir():
 
 # 6. POST /api/admin-login
 @api_bp.route("/admin-login", methods=["POST"])
-# POST /api/admin-login
-@api_bp.route("/admin-login", methods=["POST"])
 def admin_login():
     data = request.get_json(silent=True)
 
@@ -204,22 +202,22 @@ def admin_login():
     email = data.get("email")
     password = data.get("password")
 
-    if not isinstance(email, str) or not isinstance(password, str):
+    if (
+        not isinstance(email, str)
+        or not isinstance(password, str)
+        or not email.strip()
+        or not password
+    ):
         return jsonify({
             "basari": False,
             "mesaj": "E-posta ve şifre zorunludur."
         }), 400
 
-    if not email.strip() or not password:
-        return jsonify({
-            "basari": False,
-            "mesaj": "E-posta ve şifre zorunludur."
-        }), 400
+    admin_mail = (Config.ADMIN_MAIL or "").strip().casefold()
+    password_hash = Config.ADMIN_PASSWORD
+    secret_key = Config.SECRET_KEY
 
-    admin_mail = Config.ADMIN_MAIL.strip().casefold()
-    admin_password = Config.ADMIN_PASSWORD
-
-    if not admin_mail or not admin_password or not Config.SECRET_KEY:
+    if not admin_mail or not password_hash or not secret_key:
         return jsonify({
             "basari": False,
             "mesaj": "Yönetici ayarları yapılandırılmamış."
@@ -230,10 +228,13 @@ def admin_login():
         admin_mail
     )
 
-    password_match = hmac.compare_digest(
-        password,
-        admin_password
-    )
+    try:
+        password_match = check_password_hash(
+            password_hash,
+            password
+        )
+    except (ValueError, TypeError):
+        password_match = False
 
     if not (email_match and password_match):
         return jsonify({
@@ -249,7 +250,7 @@ def admin_login():
             "iat": now,
             "exp": now + timedelta(minutes=15)
         },
-        Config.SECRET_KEY,
+        secret_key,
         algorithm="HS256"
     )
 
