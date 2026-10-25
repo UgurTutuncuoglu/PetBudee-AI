@@ -214,7 +214,7 @@ def admin_login():
         }), 400
 
     admin_mail = (Config.ADMIN_MAIL or "").strip().casefold()
-    password_hash = Config.ADMIN_PASSWORD
+    password_hash = Config.ADMIN_PASSWORD_HASH
     secret_key = Config.SECRET_KEY
 
     if not admin_mail or not password_hash or not secret_key:
