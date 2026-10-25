@@ -39,7 +39,7 @@ class Config:
     )
 
     ADMIN_MAIL = os.getenv("ADMIN_MAIL", "")
-    ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD", "")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
     DEBUG = False
 
